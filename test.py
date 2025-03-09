@@ -1,4 +1,17 @@
+import random
 from map import Task, TaskSystem
+
+def det_test_rnd(task_system):
+    # j'aime imaginer que c'est Leonard Bernstein qui à fait ça, ca aurait été drôle
+    results = []
+    for _ in range(5):
+        random.seed(42)  # Fixer une graine pour la reproductibilité
+        task_system.run()
+        results.append(hash(str(task_system.tasks)))
+    if len(set(results)) > 1:
+        print("Le système n'est pas déterministe !")
+    else:
+        print("Le système est déterministe.")
 
 # Définition des variables globales
 X, Y, Z = None, None, None

@@ -1,7 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import time
-import random
 import threading
 from typing import List, Dict, Callable
 
@@ -73,18 +72,6 @@ class TaskSystem:
                 G.add_edge(dep, task)
         nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=10)
         plt.show()
-
-    def det_test_rnd(self):
-        # j'aime imaginer que c'est Leonard Bernstein qui à fait ça, ca aurait été drôle
-        results = []
-        for _ in range(5):
-            random.seed(42)  # Fixer une graine pour la reproductibilité
-            self.run()
-            results.append(hash(str(self.tasks)))
-        if len(set(results)) > 1:
-            print("Le système n'est pas déterministe !")
-        else:
-            print("Le système est déterministe.")
 
     def par_cost(self):
         start = time.time()

@@ -1,9 +1,3 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
 import networkx as nx
 import matplotlib.pyplot as plt
 import time
@@ -11,14 +5,12 @@ import random
 import threading
 from typing import List, Dict, Callable
 
-
 class Task:
     def __init__(self, name: str, reads: List[str] = None, writes: List[str] = None, run: Callable = None):
         self.name = name
         self.reads = reads if reads else []
         self.writes = writes if writes else []
         self.run = run
-
 
 class TaskSystem:
     def __init__(self, tasks: List[Task], precedence: Dict[str, List[str]]):
@@ -104,5 +96,3 @@ class TaskSystem:
         par_time = time.time() - start
 
         print(f"Temps séquentiel: {seq_time:.5f}s, Temps parallèle: {par_time:.5f}s")
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

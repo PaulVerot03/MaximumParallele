@@ -38,7 +38,7 @@ t2 = Task("T2", writes=["Y"], run=runT2)
 tSomme = Task("somme", reads=["X", "Y"], writes=["Z"], run=runTsomme)
 
 # Définition du système de tâches avec précédences
-task_system = TaskSystem([t1, t2, tSomme], {"T1": [], "T2": [], "somme": ["T1", "T2"]})
+task_system = TaskSystem([t1, t2, tSomme], {"T1": [], "T2": ["T1"], "somme": ["T1", "T2"]})
 
 # Tester l'exécution séquentielle
 print("=== Exécution séquentielle ===")

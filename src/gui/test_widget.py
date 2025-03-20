@@ -16,8 +16,8 @@ class Project:
             json.dump(project, f, indent=2)
 
 class TestWidget(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
         self.projects: list[Project] = []
         self.selected_task = None
 
@@ -35,11 +35,14 @@ class TestWidget(QWidget):
 
         self.tasks_list = QListWidget()
         self.tasks_list.addItems([task for task in self.current_project.tasks or []])
-        self.tasks_list.currentItemChanged.connect(self.onItemClick)
+        self.tasks_list.currentItemChanged.connect(self.selectItem)
 
         self.layout().addWidget(self.tests_list)
         self.layout().addWidget(self.tasks_list)
 
-    def onItemClick(self, item: QListWidgetItem):
-        print(self.selected_task.text() if self.selected_task else "", item.text())
+    def selectItem(self, item: QListWidgetItem):
+        if self.selected_task is not None:
+            code = self.current_project.tasks[self.selected_task.text()] = self.parent().getCodeContent()
+            self.parent().compileTask(self.selected_task, code)
         self.selected_task = item
+        self.parent().setCodeContent(self.current_project.tasks[item.text()])

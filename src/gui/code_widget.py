@@ -56,19 +56,17 @@ class PythonHighlighter(QSyntaxHighlighter):
                 self.setFormat(index, length, char_format)
                 index = pattern.indexIn(text, index + length)
 
-
 class CodeWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
-        layout = QVBoxLayout()
+        self.setLayout(QVBoxLayout())
         self.text_edit = QTextEdit()
         self.text_edit.setTabStopDistance(QFontMetricsF(self.text_edit.font()).horizontalAdvance(' ') * 4)
-        layout.addWidget(self.text_edit)
+        self.layout().addWidget(self.text_edit)
 
         self.highlighter = PythonHighlighter(self.text_edit.document())
 
-        self.setLayout(layout)
 

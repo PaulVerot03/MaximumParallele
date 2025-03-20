@@ -1,0 +1,6 @@
+{
+  "name": "test_a",
+  "tasks": {
+    "T1": "global a\na = 6"
+  }
+}

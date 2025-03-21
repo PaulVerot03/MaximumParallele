@@ -7,10 +7,10 @@ def f():
     t = 1
 
 def det_test_rnd(task_system):
-    # j'aime imaginer que c'est Leonard Bernstein qui à fait ça, ca aurait été drôle
+    # I like to imagine that Leonard Bernstein did that, it would have been quite funny
     results = []
     for _ in range(5):
-        random.seed(42)  # Fixer une graine pour la reproductibilité
+        random.seed(42)  # Fix the random seed
         task_system.run()
         results.append(hash(str(task_system.tasks)))
     if len(set(results)) > 1:
@@ -18,7 +18,7 @@ def det_test_rnd(task_system):
     else:
         print("Le système est déterministe.")
 
-# Définition des variables globales
+# Declare the global variables
 X, Y, Z = None, None, None
 
 def tests():
@@ -30,23 +30,24 @@ def tests():
     T6 = Task("T6", f, ["1", "2"], ["4"])
 
     sys = TaskSystem([T1, T2, T3, T4, T5, T6], { T1: {}, T2: {T1}, T3: {T1}, T4: {T2, T3}, T5: {T3}, T6: {T4, T5} })
-    # Tester l'exécution séquentielle
+    
+    # Test the sequential execution
     print("=== Exécution séquentielle ===")
     sys.run_seq()
 
-    # Tester l'exécution parallèle
+    # Test the parallel execution of the program
     print("=== Exécution parallèle ===")
     sys.run()
 
-    # Afficher le graphe de précédence
+    # Show the result of the execution
     print("=== Graphe de précédence ===")
     sys.draw()
 
-    # Tester le déterminisme
+    # Test if the sequence is deterministic
     print("=== Test de déterminisme ===")
     det_test_rnd(sys)
 
-    # Comparer les coûts d'exécution
+    # Compare the execution cost
     print("=== Comparaison des temps d'exécution ===")
     sys.par_cost()
 

@@ -6,6 +6,7 @@ import threading
 from typing import Callable
 import dis
 
+# Declare a class Task taking as entry a name, function and possibly 2 strings lists.
 class Task:
     def __init__(self, name: str, run: Callable, reads: list[str] = None, writes: list[str] = None):
         assert type(name) is str and type(run).__name__ == "function", "Domain error"
@@ -16,6 +17,7 @@ class Task:
     def __repr__(self):
         return '&' + self.name
 
+# Declare the class TaskSystem and it's associated methods
 class TaskSystem:
     def __init__(self, tasks: list[Task], precedence: dict[Task, set[Task]]=None):
         self.tasks = tasks
@@ -36,6 +38,7 @@ class TaskSystem:
             tasks.append( (deps, all_deps) )
         self.dependencies = { self.tasks[i]: tasks[i][0] for i in range(len(tasks)) }
 
+    #Methods that check if the system is deterministic
     def isDeterministic(self):
         assert isinstance(self.dependencies, dict)
         tasks = [set() for _ in range(len(self.tasks))]
@@ -51,7 +54,7 @@ class TaskSystem:
         return "Deterministic"
 
     def validate(self):
-        # Vérifier que toutes les tâches dans precedence existent
+        #Check that all tasks exist
         for task, deps in self.dependencies.items():
             if task not in self.tasks:
                 raise ValueError(f"Tâche inconnue: {task}")
@@ -60,21 +63,23 @@ class TaskSystem:
                     raise ValueError(f"Dépendance inconnue: {dep}")
         print("Validation réussie !")
 
+    # get all dependecies
     def get_dependencies(self, task: Task):
         return self.dependencies.get(task, [])
-
+# allow a sequence of task to run
     def run_seq(self):
         for task in self.tasks:
             task.run()
-
-    def run(self):
+# allow the Tasks to run
+    def run(self): 
         threads = {}
         executed = set()
 
+# allow for tasks to be runned in parallel 
         def execute_parallel(task):
             for dep in self.get_dependencies(task):
                 if dep not in executed:
-                    return  # Attendre que la dépendance soit exécutée
+                    return  # Wait for all dependecies to be executed
             print(f"Exécution parallèle: {task}")
             task.run()
             executed.add(task)
@@ -96,6 +101,7 @@ class TaskSystem:
         nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=10)
         plt.show()
 
+# allow the program to calculate the time taken by each task sequence
     def par_cost(self):
         start = time.time()
         self.run_seq()

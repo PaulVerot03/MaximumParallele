@@ -63,21 +63,18 @@ class TaskSystem:
                     raise ValueError(f"Dépendance inconnue: {dep}")
         print("Validation réussie !")
 
-    # get all dependecies
-    def get_dependencies(self, task: Task):
-        return self.dependencies.get(task, [])
-# allow a sequence of task to run
-    def run_seq(self):
+    # allow a sequence of task to run
+    def runSequence(self):
         for task in self.tasks:
             task.run()
-# allow the Tasks to run
-    def run(self): 
+    # allow the Tasks to run
+    def run(self):
         threads = {}
         executed = set()
 
-# allow for tasks to be runned in parallel 
-        def execute_parallel(task):
-            for dep in self.get_dependencies(task):
+        # allow for tasks to be runned in parallel
+        def parallelExecution(task):
+            for dep in self.dependencies.get(task, []):
                 if dep not in executed:
                     return  # Wait for all dependecies to be executed
             print(f"Exécution parallèle: {task}")
@@ -85,7 +82,7 @@ class TaskSystem:
             executed.add(task)
 
         for task in self.tasks:
-            threads[task] = threading.Thread(target=execute_parallel, args=(task,))
+            threads[task] = threading.Thread(target=parallelExecution, args=(task,))
 
         for task in self.dependencies:
             threads[task].start()
@@ -101,8 +98,8 @@ class TaskSystem:
         nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=10)
         plt.show()
 
-# allow the program to calculate the time taken by each task sequence
-    def par_cost(self):
+    # allow the program to calculate the time taken by each task sequence
+    def compareCost(self):
         start = time.time()
         self.run_seq()
         seq_time = time.time() - start

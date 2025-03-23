@@ -1,7 +1,7 @@
 {
   "name": "test_a",
   "tasks": {
-    "T1": "global a\na = 4",
+    "T1": "global a\na = 0",
     "T2": "global a\na += 1"
   }
 }

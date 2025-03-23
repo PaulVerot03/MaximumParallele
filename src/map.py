@@ -1,7 +1,6 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
-import time
 import threading
 from typing import Callable
 import dis
@@ -25,7 +24,29 @@ class TaskSystem:
             self.dependencies = precedence
             self.validate()
             print(self.isDeterministic())
+        self.makeLayers()
         self.maximizeParalization()
+
+    def makeLayers(self, sort_tasks=True):
+        free_tasks = set(self.tasks)
+        self.layers = [ [task for task, deps in self.dependencies.items() if len(deps) == 0] ]
+        visited_tasks = set(self.layers[0])
+        free_tasks.difference_update(visited_tasks)
+
+        while len(free_tasks) != 0:
+            next_layer = set()
+            for task in free_tasks:
+                if self.dependencies[task].issubset(visited_tasks):
+                    next_layer.add(task)
+            assert len(next_layer) != 0, "Cycle detected!"
+            visited_tasks.update(next_layer)
+            free_tasks.difference_update(next_layer)
+            self.layers.append(next_layer)
+
+        if sort_tasks:
+            self.tasks = []
+            for tasks in self.layers:
+                self.tasks += list(tasks)
 
     def maximizeParalization(self): # Complexity: O(n*log(n)) ?
         tasks: list[tuple[set[str], set[str]]] = [] # (deps, all_deps: set(str))
@@ -94,18 +115,6 @@ class TaskSystem:
         G = nx.DiGraph()
         for task, deps in self.dependencies.items():
             for dep in deps:
-                G.add_edge(dep, task.name)
+                G.add_edge(dep.name, task.name)
         nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=10)
         plt.show()
-
-    # allow the program to calculate the time taken by each task sequence
-    def compareCost(self):
-        start = time.time()
-        self.run_seq()
-        seq_time = time.time() - start
-
-        start = time.time()
-        self.run()
-        par_time = time.time() - start
-
-        print(f"Temps séquentiel: {seq_time:.5f}s, Temps parallèle: {par_time:.5f}s")

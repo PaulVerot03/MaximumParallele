@@ -23,9 +23,10 @@ class TaskSystem:
         if precedence is not None:
             self.dependencies = precedence
             self.validate()
-            print(self.isDeterministic())
-        self.makeLayers()
+            # print(self.isDeterministic())
+            self.makeLayers()
         self.maximizeParalization()
+        self.makeLayers()
 
     def makeLayers(self, sort_tasks=True):
         free_tasks = set(self.tasks)
@@ -45,8 +46,10 @@ class TaskSystem:
 
         if sort_tasks:
             self.tasks = []
-            for tasks in self.layers:
+            for i, tasks in enumerate(self.layers):
                 self.tasks += list(tasks)
+                for task in tasks:
+                    task.layer = i
 
     def maximizeParalization(self): # Complexity: O(n*log(n)) ?
         tasks: list[tuple[set[str], set[str]]] = [] # (deps, all_deps: set(str))

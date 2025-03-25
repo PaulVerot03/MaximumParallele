@@ -3,6 +3,7 @@ from PyQt5.QtGui import QColor
 from gui.code_widget import CodeWidget
 from gui.test_widget import TestWidget
 from gui.diagram_widget import DiagramWidget
+from map import Task, TaskSystem
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -11,7 +12,7 @@ class MainWindow(QWidget):
         self.secure_namespace = {}
 
     def initUI(self):
-        self.setWindowTitle("Maximum Paralallllllllllllllllllllllllllllllllllllllllllllll")
+        self.setWindowTitle("Maximum Automatic Parallelization")
         self.setLayout(QHBoxLayout())
 
         self.test_widget = TestWidget(self)
@@ -21,6 +22,8 @@ class MainWindow(QWidget):
 
         self.tabs.addTab(self.code_widget, "Code Editor")
         self.tabs.addTab(self.diagram_widget, "Schema")
+
+        self.tabs.tabBarClicked.connect(self.selectTab)
 
         self.layout().addWidget(self.test_widget)
         self.layout().addWidget(self.tabs)
@@ -45,6 +48,25 @@ class MainWindow(QWidget):
             task_item.setForeground(QColor(0xFF0000))
         else:
             task_item.setForeground(QColor(0x00FF00))
+
+    def parallelize(self):
+        if self.test_widget.current_project is None: return
+        tasks = []
+        for name, code in self.test_widget.current_project.tasks.items():
+            f = self.convertStringToCallable(code)
+            if f is None:
+                print("Error")
+                return
+            else:
+                tasks.append(Task(name, f))
+        sys = TaskSystem(tasks)
+        self.diagram_widget.drawGraph(sys)
+
+    def selectTab(self, index):
+        if index == 1:
+            if self.test_widget.current_project is not None and self.test_widget.selected_task is not None:
+                self.test_widget.current_project.tasks[self.test_widget.selected_task.text()] = self.getCodeContent()
+            self.parallelize()
 
     def __del__(self):
         if self.test_widget.selected_task is not None:

@@ -3,6 +3,7 @@ from PyQt5.QtGui import QColor
 from gui.code_widget import CodeWidget
 from gui.test_widget import TestWidget
 from gui.diagram_widget import DiagramWidget
+import time
 from map import Task, TaskSystem
 
 class MainWindow(QWidget):
@@ -61,6 +62,21 @@ class MainWindow(QWidget):
                 tasks.append(Task(name, f))
         sys = TaskSystem(tasks)
         self.diagram_widget.drawGraph(sys)
+
+        self.compareSysCost(sys)
+
+    # allow the program to calculate the time taken by each task sequence
+    def compareSysCost(self, sys: TaskSystem):
+        start = time.time()
+        sys.runSequence()
+        seq_time = time.time() - start
+
+        start = time.time()
+        sys.run()
+        par_time = time.time() - start
+
+        print(f"Temps séquentiel: {seq_time:.5f}s, Temps parallèle: {par_time:.5f}s")
+
 
     def selectTab(self, index):
         if index == 1:

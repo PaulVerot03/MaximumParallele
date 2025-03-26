@@ -3,8 +3,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from map import TaskSystem, Task
-
 class DiagramWidget(QWidget):
     def __init__(self):
         super().__init__()

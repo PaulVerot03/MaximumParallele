@@ -89,23 +89,31 @@ class TaskSystem:
 
     # allow a sequence of task to run
     def runSequence(self):
-        for task in self.tasks:
-            task.run()
+        try:
+            for task in self.tasks:
+                task.run()
+        except:
+            return True
     # allow the Tasks to run
     def run(self):
         threads = {}
-        executed = set()
+        error = False
 
         # allow for tasks to be runned in parallel
         def parallelExecution(task):
-            for dep in self.dependencies.get(task, []):
-                if dep not in executed:
-                    return  # Wait for all dependecies to be executed
-            print(f"Exécution parallèle: {task}")
-            task.run()
-            executed.add(task)
+            nonlocal error
+            # Wait for all dependecies to be executed
+            for dep in self.dependencies[task]:
+                while not dep.executed:
+                    pass
+            try:
+                task.run()
+            except:
+                error = True
+            task.executed = True
 
         for task in self.tasks:
+            task.executed = False
             threads[task] = threading.Thread(target=parallelExecution, args=(task,))
 
         for task in self.dependencies:
@@ -113,6 +121,8 @@ class TaskSystem:
 
         for task in self.dependencies:
             threads[task].join()
+
+        return error
 
     def draw(self):
         G = nx.DiGraph()

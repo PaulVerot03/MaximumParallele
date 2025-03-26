@@ -12,9 +12,8 @@ class DiagramWidget(QWidget):
         self.setLayout(QVBoxLayout())
 
         self.canvas = FigureCanvas(plt.figure(figsize=(5, 4)))
-        self.layout().addWidget(self.canvas)
-
         self.ax = self.canvas.figure.add_subplot()
+        self.layout().addWidget(self.canvas)
 
     def drawGraph(self, sys):
         self.ax.clear()

@@ -1,0 +1,14 @@
+{
+  "name": "TEST",
+  "tasks": {
+    "T1": "global x,y,z\nx  = 1\n",
+    "T2": "global x,y,z\ny = 1 ",
+    "T3": "global z\nz = x + y",
+    "T1.2": "global x,y,z\nx  += 1\n",
+    "T2.2": "global x,y,z\ny  += 1",
+    "T1.3": "global x,y,z\nx  += 1\n",
+    "T2.3": "global x,y,z\ny  += 1",
+    "TF": "global x,y,z\nz = x**2 + y**2",
+    "Sequence": ""
+  }
+}

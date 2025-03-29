@@ -2,7 +2,7 @@
 
 ## Overview
 
-This program defines a system for managing and executing tasks with dependencies and producing a visualisation of said tasks. It ensures proper execution order while maximizing parallelization where possible. 
+This program defines a system for managing and executing tasks with dependencies and producing a visualisation of said tasks. It ensures proper execution order while maximizing parallelization where possible.
 
 ## Dependencies
 
@@ -72,27 +72,15 @@ Manages a collection of tasks, enforcing dependencies and parallel execution whe
 
 ```python
 # Define task functions
-def taskA():
-    print("Executing Task A")
-def taskB():
-    print("Executing Task B")
-def taskC():
-    print("Executing Task C")
-
-# Create Task instances
-task1 = Task("Task A", taskA)
-task2 = Task("Task B", taskB)
-task3 = Task("Task C", taskC)
-
-# Define dependencies
-dependencies = {
-    task2: {task1},  # Task B depends on Task A
-    task3: {task1, task2}  # Task C depends on Task A and Task B
-}
+T1 = Task("T1", f, ["1"], ["4"])
+T2 = Task("T2", f, ["3", "4"], ["1"])
+T3 = Task("T3", f, ["3", "4"], ["5"])
+T4 = Task("T4", f, ["4"], ["2"])
+T5 = Task("T5", f, ["5"], ["5"])
+T6 = Task("T6", f, ["1", "2"], ["4"])
 
 # Create and execute TaskSystem
-task_system = TaskSystem([task1, task2, task3], dependencies)
-task_system.run()
+sys = TaskSystem([T1, T2, T3, T4, T5, T6], { T1: {}, T2: {T1}, T3: {T1}, T4: {T2, T3}, T5: {T3}, T6: {T4, T5} })task_system.run()
 ```
 
 ## Visualization
@@ -105,11 +93,9 @@ task_system.draw()
 
 This will display a directed graph of task dependencies.
 
-
-
 ## Usage
 
-When launched with the provided makefile, the user can interact and set tasks using a GUI in which the user can set and use provided or custom sequences. 
+When launched with the provided makefile, the user can interact and set tasks using a GUI in which the user can set and use provided or custom sequences.
 
 ## Notes
 
@@ -119,6 +105,4 @@ When launched with the provided makefile, the user can interact and set tasks us
 
 - Ensure task functions are thread-safe when using parallel execution.
 
-
-
-[Github Link](https://github.com/PaulVerot03/MaximumParallele)
+[Github Repository](https://github.com/PaulVerot03/MaximumParallele)

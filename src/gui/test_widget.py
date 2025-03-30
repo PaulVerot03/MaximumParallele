@@ -30,7 +30,7 @@ class TestWidget(QWidget):
 
         self.ax.clear()
         self.ax.barh((0, 1), [seq_time, par_time])
-        self.ax.set_yticks((0, 1), labels=('Parallel', 'Sequential'))
+        self.ax.set_yticks((0, 1), labels=('Sequential','Parallel'))
         self.ax.set_xlim(0, max(seq_time, par_time))
         self.ax.set_xlabel("Time (s)")
 

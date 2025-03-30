@@ -26,7 +26,7 @@ class TestWidget(QWidget):
         sys.run_layers()
         par_time = time.time() - start
 
-        print(f"Temps séquentiel: {seq_time:.5f}s, Temps parallèle: {par_time:.5f}s")
+        print(f"Sequencial Time: {seq_time:.5f}s, Parallel Time: {par_time:.5f}s")
 
         self.ax.clear()
         self.ax.barh((0, 1), [seq_time, par_time])

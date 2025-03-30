@@ -80,6 +80,7 @@ class ProjectsWidget(QWidget):
                 return
         self.loadProject(index - 1)
         self.previous_project_index = index - 1
+        self.parent().selectTab(self.parent().tab_index)
 
     def selectItem(self, item: QListWidgetItem):
         if item is None or item.text() == "NEW TASK": return

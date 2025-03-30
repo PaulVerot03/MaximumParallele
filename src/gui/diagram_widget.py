@@ -11,12 +11,13 @@ class DiagramWidget(QWidget):
     def initUI(self):
         self.setLayout(QVBoxLayout())
 
-        self.canvas = FigureCanvas(plt.figure(figsize=(5, 4)))
+        self.canvas = FigureCanvas(plt.figure(tight_layout=True)) # figsize=(5, 4)
         self.ax = self.canvas.figure.add_subplot()
         self.layout().addWidget(self.canvas)
 
     def drawGraph(self, sys):
         self.ax.clear()
+        if len(sys.tasks) == 0: return
 
         G = nx.DiGraph()
         for task in sys.tasks:

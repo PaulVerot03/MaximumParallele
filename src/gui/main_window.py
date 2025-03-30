@@ -12,6 +12,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.initUI()
         self.secure_namespace = {}
+        self.tab_index = 0
 
     def initUI(self):
         self.setWindowTitle("Maximum Automatic Parallelization")
@@ -53,39 +54,28 @@ class MainWindow(QWidget):
         else:
             task_item.setForeground(QColor(0x00FF00))
 
-    def parallelize(self):
-        if self.projects_widget.current_project is None: return
+    def createSystem(self):
         tasks = []
         for name, code in self.projects_widget.current_project.tasks.items():
             f = self.convertStringToCallable(code)
             if f is None:
-                print("Error")
-                return
+                raise Exception("Undefined function")
             else:
                 tasks.append(Task(name, f))
-        sys = TaskSystem(tasks)
-        self.diagram_widget.drawGraph(sys)
+        return TaskSystem(tasks, namespace=self.secure_namespace)
 
-        self.compareSysCost(sys)
-
-    # allow the program to calculate the time taken by each task sequence
-    def compareSysCost(self, sys: TaskSystem):
-        start = time.time()
-        sys.runSequence()
-        seq_time = time.time() - start
-
-        start = time.time()
-        sys.run()
-        par_time = time.time() - start
-
-        print(f"Temps séquentiel: {seq_time:.5f}s, Temps parallèle: {par_time:.5f}s")
-
+    def parallelize(self):
+        if self.projects_widget.current_project is None: return
+        self.diagram_widget.drawGraph(self.createSystem())
 
     def selectTab(self, index):
+        self.tab_index = index
         if index == 1:
             if self.projects_widget.current_project is not None and self.projects_widget.selected_task is not None:
                 self.projects_widget.current_project.tasks[self.projects_widget.selected_task.text()] = self.getCodeContent()
             self.parallelize()
+        elif index == 2:
+            self.test_widget.compareSystemCost(self.createSystem())
 
     def __del__(self):
         if self.projects_widget.selected_task is not None:

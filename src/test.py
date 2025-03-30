@@ -2,22 +2,37 @@ import random
 import time
 import sys
 from map import Task, TaskSystem
-from gui.main_window import startMainWindow
-
-def f():
-    t = 1
+try:
+    from gui.main_window import startMainWindow
+    no_gui = False
+except:
+    no_gui = True
 
 # I like to imagine that Leonard Bernstein did that, it would have been quite funny
-def det_test_rnd(task_system):
-    results = []
-    for _ in range(5):
-        random.seed(42)  # Fix the random seed
-        task_system.run()
-        results.append(hash(str(task_system.tasks)))
-    if len(set(results)) > 1:
-        print("Le système n'est pas déterministe !")
-    else:
-        print("Le système est déterministe.")
+def randomDeterminismTest(sys: TaskSystem, tests_count=5):
+    namespace = sys.namespace if sys.namespace is not None else globals()
+    writes = set()
+    for task in sys.tasks:
+        writes.update(task.writes)
+    namespaces = []
+
+    for _ in range(tests_count):
+        try:
+            for layer in sys.layers:
+                layer = list(layer)
+                random.shuffle(layer)
+                for task in layer:
+                    task.run()
+            namespaces.append(namespace.copy())
+        except Exception as e:
+            print("Error in task's function:\n", e)
+            return
+
+    for write in writes:
+        if any(map(lambda ns: ns[write] != namespaces[0][write], namespaces)):
+            print("The system isn't deterministic")
+            return
+    print("The system may be deterministic")
 
 # allow the program to calculate the time taken by each task sequence
 def compareCost(sys: TaskSystem):
@@ -32,17 +47,20 @@ def compareCost(sys: TaskSystem):
     print(f"Temps séquentiel: {seq_time:.5f}s, Temps parallèle: {par_time:.5f}s")
 
 # Declare the global variables
-X, Y, Z = None, None, None
+A, B, C, D, E = None, None, None, None, None
+def f():
+    global A
+    A = 1
 
 def tests():
-    T1 = Task("T1", f, ["1"], ["4"])
-    T2 = Task("T2", f, ["3", "4"], ["1"])
-    T3 = Task("T3", f, ["3", "4"], ["5"])
-    T4 = Task("T4", f, ["4"], ["2"])
-    T5 = Task("T5", f, ["5"], ["5"])
-    T6 = Task("T6", f, ["1", "2"], ["4"])
+    T1 = Task("T1", f, ["A"], ["D"])
+    T2 = Task("T2", f, ["C", "D"], ["A"])
+    T3 = Task("T3", f, ["C", "D"], ["E"])
+    T4 = Task("T4", f, ["D"], ["B"])
+    T5 = Task("T5", f, ["E"], ["E"])
+    T6 = Task("T6", f, ["A", "B"], ["D"])
 
-    sys = TaskSystem([T1, T2, T3, T4, T5, T6], { T1: {}, T2: {T1}, T3: {T1}, T4: {T2, T3}, T5: {T3}, T6: {T4, T5} })
+    sys = TaskSystem([T1, T6, T2, T3, T4, T5], { T1: {}, T2: {T1}, T3: {T1}, T4: {T2, T3}, T5: {T3}, T6: {T4, T5} })
 
     # Test the sequential execution
     print("=== Exécution séquentielle ===")
@@ -58,14 +76,14 @@ def tests():
 
     # Test if the sequence is deterministic
     print("=== Test de déterminisme ===")
-    det_test_rnd(sys)
+    randomDeterminismTest(sys)
 
     # Compare the execution cost
     print("=== Comparaison des temps d'exécution ===")
     compareCost(sys)
 
 def main(args):
-    if "-nogui" in args:
+    if no_gui or "-nogui" in args:
         return tests()
 
     return startMainWindow()

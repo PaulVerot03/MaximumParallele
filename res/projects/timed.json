@@ -1,0 +1,9 @@
+{
+  "name": "timed",
+  "tasks": {
+    "begin": "global a, b\na = 0\nb = 0",
+    "par_A": "global a\nimport time\nfor i in range(100):\n\ta +=i\n\ttime.sleep(0.001)",
+    "par_B": "global b\nimport time\nfor i in range(100):\n\tb +=i\n\ttime.sleep(0.001)",
+    "end": "global a, b, c\nc = a + b"
+  }
+}

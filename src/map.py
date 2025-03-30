@@ -18,13 +18,20 @@ class Task:
 
 # Declare the class TaskSystem and it's associated methods
 class TaskSystem:
-    def __init__(self, tasks: list[Task], precedence: dict[Task, set[Task]]=None):
+    def __init__(self, tasks: list[Task], precedence: dict[Task, set[Task]]=None, namespace=None):
         self.tasks = tasks
+        self.namespace = namespace
+
+        for i, task in enumerate(tasks):
+            assert task.name not in [t.name for t in tasks[i+1:]], "Task duplication"
+
         if precedence is not None:
             self.dependencies = precedence
             self.validate()
-            # print(self.isDeterministic())
-            self.makeLayers()
+            self.computeAllDependencies()
+            self.checkDeterminism()
+            # To work with unordered tasks
+            self.tasks.sort(key=lambda task: len(self.all_dependencies[task]))
         self.maximizeParalization()
         self.makeLayers()
 
@@ -62,20 +69,31 @@ class TaskSystem:
             tasks.append( (deps, all_deps) )
         self.dependencies = { self.tasks[i]: tasks[i][0] for i in range(len(tasks)) }
 
-    #Methods that check if the system is deterministic
-    def isDeterministic(self):
-        assert isinstance(self.dependencies, dict)
-        tasks = [set() for _ in range(len(self.tasks))]
+    def __computeAllDependencies(self, task):
+        if task in self.all_dependencies:
+            return
+        self.all_dependencies[task] = self.dependencies[task].copy()
+        for dep in self.dependencies[task]:
+            self.__computeAllDependencies(dep)
+            self.all_dependencies[task].update(self.all_dependencies[dep])
+
+        assert task not in self.all_dependencies[task], "Cycle detected"
+
+    def computeAllDependencies(self):
+        self.all_dependencies: dict[Task, set[Task]] = {}
+        for task in self.tasks:
+            self.__computeAllDependencies(task)
+
+    def getDependencies(self):
+        return self.dependencies
+
+    def isPathBetween(self, A, B):
+        return B in self.all_dependencies[A] or A in self.all_dependencies[B]
+
+    def checkDeterminism(self):
         for i, task1 in enumerate(self.tasks):
             for j, task2 in enumerate(self.tasks[:i]):
-                # Check Bernstein conditions
-                if (task1.writes & (task2.writes | task2.reads)) or (task2.writes & task1.reads):
-                    tasks[i].update({task2})
-                    tasks[i].update(tasks[j])
-            print(self.dependencies.get(task1, set()), tasks[i])
-            if not tasks[i].issubset(self.dependencies.get(task1, set())):
-                return "Error"
-        return "Deterministic"
+                assert not ((task1.writes & (task2.writes | task2.reads)) or (task2.writes & task1.reads)) or self.isPathBetween(task1, task2), "Undeterministic Graph"
 
     def validate(self):
         #Check that all tasks exist
@@ -115,19 +133,42 @@ class TaskSystem:
         for task in self.tasks:
             task.executed = False
             threads[task] = threading.Thread(target=parallelExecution, args=(task,))
-
-        for task in self.dependencies:
             threads[task].start()
 
-        for task in self.dependencies:
+        for task in self.tasks:
             threads[task].join()
 
         return error
 
+    def run_layers(self):
+        threads = {}
+        error = False
+
+        # allow for tasks to be runned in parallel
+        def parallelExecution(task):
+            nonlocal error
+            try:
+                task.run()
+            except:
+                error = True
+
+        for layer in self.layers:
+            for task in layer:
+                threads[task] = threading.Thread(target=parallelExecution, args=(task,))
+                threads[task].start()
+            for task in layer:
+                threads[task].join()
+
+        return error
+
     def draw(self):
+        assert len(self.tasks) > 0
         G = nx.DiGraph()
+        for task in self.tasks:
+            G.add_node(task.name, layer=task.layer)
         for task, deps in self.dependencies.items():
             for dep in deps:
                 G.add_edge(dep.name, task.name)
-        nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=10)
+        pos = nx.multipartite_layout(G, subset_key="layer")
+        nx.draw(G, pos=pos, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=10)
         plt.show()

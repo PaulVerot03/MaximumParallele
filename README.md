@@ -106,3 +106,4 @@ When launched with the provided makefile, the user can interact and set tasks us
 - Ensure task functions are thread-safe when using parallel execution.
 
 [Github Repository](https://github.com/PaulVerot03/MaximumParallele)
+[PowerPoint presentation](https://ueve-my.sharepoint.com/:p:/g/personal/20220212_etud_univ-evry_fr/EbZ7mhL2wRxNiqbO6q6G5D0BxSINBMAM_Qw35S93nbx1SQ?e=ymnTNR)

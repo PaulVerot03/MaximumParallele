@@ -44,7 +44,7 @@ def compareCost(sys: TaskSystem):
     sys.run()
     par_time = time.time() - start
 
-    print(f"Temps séquentiel: {seq_time:.5f}s, Temps parallèle: {par_time:.5f}s")
+    print(f"Sequencial Time: {seq_time:.5f}s, Parallele Time: {par_time:.5f}s")
 
 # Declare the global variables
 A, B, C, D, E = None, None, None, None, None
@@ -63,23 +63,23 @@ def tests():
     sys = TaskSystem([T1, T6, T2, T3, T4, T5], { T1: {}, T2: {T1}, T3: {T1}, T4: {T2, T3}, T5: {T3}, T6: {T4, T5} })
 
     # Test the sequential execution
-    print("=== Exécution séquentielle ===")
+    print("=== Sequencial Execution ===")
     sys.runSequence()
 
     # Test the parallel execution of the program
-    print("=== Exécution parallèle ===")
+    print("=== Parallel Execution ===")
     sys.run()
 
     # Show the result of the execution
-    print("=== Graphe de précédence ===")
+    print("=== Dependence Graph ===")
     sys.draw()
 
     # Test if the sequence is deterministic
-    print("=== Test de déterminisme ===")
+    print("=== Testing for Determinism ===")
     randomDeterminismTest(sys)
 
     # Compare the execution cost
-    print("=== Comparaison des temps d'exécution ===")
+    print("=== Comparision for Time to Completion ===")
     compareCost(sys)
 
 def main(args):

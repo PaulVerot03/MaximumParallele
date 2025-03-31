@@ -58,7 +58,7 @@ Manages a collection of tasks, enforcing dependencies and parallel execution whe
 
 - `maximizeParalization(self)`: Optimizes task parallelization while ensuring dependencies are met.
 
-- `isDeterministic(self)`: Checks if the system follows a deterministic execution order.
+- `checkDeterminism(self)`: Checks if the system follows a deterministic execution order.
 
 - `validate(self)`: Ensures all tasks and dependencies are correctly defined.
 
@@ -80,7 +80,8 @@ T5 = Task("T5", f, ["5"], ["5"])
 T6 = Task("T6", f, ["1", "2"], ["4"])
 
 # Create and execute TaskSystem
-sys = TaskSystem([T1, T2, T3, T4, T5, T6], { T1: {}, T2: {T1}, T3: {T1}, T4: {T2, T3}, T5: {T3}, T6: {T4, T5} })task_system.run()
+task_system = TaskSystem([T1, T2, T3, T4, T5, T6], { T1: {}, T2: {T1}, T3: {T1}, T4: {T2, T3}, T5: {T3}, T6: {T4, T5} })
+task_system.run()
 ```
 
 ## Visualization

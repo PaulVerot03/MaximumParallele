@@ -35,16 +35,18 @@ def randomDeterminismTest(sys: TaskSystem, tests_count=5):
     print("The system may be deterministic")
 
 # allow the program to calculate the time taken by each task sequence
-def compareCost(sys: TaskSystem):
-    start = time.time()
-    sys.runSequence()
-    seq_time = time.time() - start
+def compareCost(sys: TaskSystem, n=5):
+    seq_time, par_time = 0, 0
+    for _ in range(n):
+        start = time.time()
+        sys.runSequence()
+        seq_time += time.time() - start
 
-    start = time.time()
-    sys.run()
-    par_time = time.time() - start
+        start = time.time()
+        sys.run()
+        par_time += time.time() - start
 
-    print(f"Sequencial Time: {seq_time:.5f}s, Parallele Time: {par_time:.5f}s")
+    print(f"Sequencial Time: {seq_time / n:.5f}s, Parallele Time: {par_time / n:.5f}s")
 
 # Declare the global variables
 A, B, C, D, E = None, None, None, None, None

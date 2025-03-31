@@ -17,16 +17,19 @@ class TestWidget(QWidget):
         self.ax = self.canvas.figure.add_subplot()
 
     # allow the program to calculate the time taken by each task sequence
-    def compareSystemCost(self, sys):
-        start = time.time()
-        sys.runSequence()
-        seq_time = time.time() - start
+    def compareSystemCost(self, sys, n=3):
+        seq_time, par_time = 0, 0
+        for _ in range(n):
+            start = time.time()
+            sys.runSequence()
+            seq_time += time.time() - start
 
-        start = time.time()
-        sys.run_layers()
-        par_time = time.time() - start
+            start = time.time()
+            sys.run_layers()
+            par_time += time.time() - start
 
-        print(f"Sequencial Time: {seq_time:.5f}s, Parallel Time: {par_time:.5f}s")
+        seq_time /= n
+        par_time /= n
 
         self.ax.clear()
         self.ax.barh((0, 1), [seq_time, par_time])

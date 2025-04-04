@@ -29,9 +29,9 @@ class TaskSystem:
             self.dependencies = precedence
             self.validate()
             self.computeAllDependencies()
-            self.checkDeterminism()
             # To work with unordered tasks
             self.tasks.sort(key=lambda task: len(self.all_dependencies[task]))
+            self.checkDeterminism()
         self.maximizeParalization()
         self.makeLayers()
 
